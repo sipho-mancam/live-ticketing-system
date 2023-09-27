@@ -1,0 +1,37 @@
+
+
+.menu-bar{
+    /* border: 1px solid black; */
+    display: flex;
+    padding: 2px;
+    padding-left: 26px;
+    padding-right:26px;
+    box-shadow: grey 5px 0px 25px;
+    margin-bottom: 26px;
+
+}
+
+.menu-bar strong{
+    display: flex;
+    vertical-align: middle;
+    padding: 24px;
+    font-size: larger;
+}
+
+.menu-bar ul{
+    margin-left: auto;
+    display: flex;
+}
+
+.menu-bar ul li{
+    margin: 1.1em;
+    list-style-type: none;
+    padding: 6px;
+}
+
+.menu-bar ul li a{
+    text-decoration: none;
+    color:rgb(27, 84, 110);
+    font-weight: bold;    
+}
+
