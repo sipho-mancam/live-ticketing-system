@@ -1,5 +1,5 @@
-from constants import *
-from db_connector import create_db_connector, DBEndpoint
+from .constants import *
+from .db_connector import create_db_connector, DBEndpoint
 from pprint import pprint
 import json
 import datetime

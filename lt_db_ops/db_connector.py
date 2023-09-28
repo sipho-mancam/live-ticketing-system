@@ -1,8 +1,8 @@
 import mysql.connector
-from constants import *
+from .constants import *
 import datetime
 import time
-import utils
+from . import utils
 
 class DatabaseConnector:
     def __init__(self, host, user, password, database):
