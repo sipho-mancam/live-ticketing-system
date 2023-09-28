@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Table from Python Dictionary</title>
+</head>
+<body>
+
+<table border="1">
+  <thead>
+    <tr>
+      {% for key in data.keys() %}
+      {% if key != "tasks"%}
+        <th>{{ key }}</th>
+        {%endif%}
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      {% for value in data.values() %}
+        <td>{{ value }}</td>
+      {% endfor %}
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>
