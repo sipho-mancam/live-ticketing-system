@@ -34,3 +34,6 @@ CREATE TABLE `live_ticketing_db`.`tasks` (
 
 ALTER TABLE `employees`
   ADD UNIQUE INDEX `email_UNIQUE` (`email`);
+
+ALTER TABLE live_ticketing_db.department
+	ADD UNIQUE INDEX `dept_name_UNIQUE` (`dept_name`);
