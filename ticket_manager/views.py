@@ -8,5 +8,5 @@ def default_view(request:HttpRequest)->HttpResponse:
     connector = db_connector.create_db_connector()
     tickets = connector.read_tickets()
     tickets = parse2JSON.parse_tickets(tickets)
-    print(tickets)
-    return HttpResponse(tickets) #render(request, 'defaultView.html', {})
+    connector.close_connection()
+    return render(request, 'defaultView.html', {'tickets':tickets}) #render(request, 'defaultView.html', {})

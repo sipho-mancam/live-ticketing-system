@@ -176,6 +176,7 @@ MIDDLEWARE = [
 
     # Add the account middleware:
     'allauth.account.middleware.AccountMiddleware',
+    'ticket_manager.middleware.XFrameOptionsMiddleware',
 ]
 
 # Provider specific settings
@@ -275,6 +276,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static/",
+    BASE_DIR / "ticket_manager/static",
 ]
 
 # Default primary key field type

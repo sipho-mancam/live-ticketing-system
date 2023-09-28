@@ -1,0 +1,14 @@
+{% extends "_base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Ticking System" %}{% endblock head_title %}
+
+{% block content %}
+
+
+<div class="frame-container">
+<iframe  src="{% url 'ticket_man' %}" width="90%" height="480"></iframe>
+</div>
+
+{% endblock content %}

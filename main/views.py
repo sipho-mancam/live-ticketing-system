@@ -4,8 +4,7 @@ from django.http import HttpRequest, HttpResponse
 
 
 def index(request:HttpRequest)->HttpResponse:
-
-    return HttpResponse("Welcome to the app")
+    return render(request, 'index.html', {})
 
 def profile(request:HttpRequest)->HttpResponse:
     

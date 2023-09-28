@@ -1,0 +1,10 @@
+
+
+.frame-container{
+    display: flex;
+}
+
+body  iframe{
+    background-color: aqua;
+    margin: auto;
+}

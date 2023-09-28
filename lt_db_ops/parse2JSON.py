@@ -21,7 +21,11 @@ def create_ticket_json(ticket: dict)->dict: # this will fetch all
     ticket_id = ticket[COL_TIC_ID]
     ticket = ticket_time_date(ticket)
 
+    s = ticket[COL_TIC_STATUS]
+    ticket[COL_TIC_STATUS] = "Open" if s == STATUS_OPEN or s == STATUS_PRELIM_COMPLETE else "Complete"
     db_connector = create_db_connector()
+    departments = db_connector.read_one_department(ticket[COL_TIC_DEPARTMENT])
+    ticket[COL_TIC_DEPARTMENT] = departments[0][COL_DEP_NAME]
     tasks = db_connector.read_tasks(ticket_id)
     tasks = tasks_time_parse(tasks)
     ticket[TASKS] = tasks
