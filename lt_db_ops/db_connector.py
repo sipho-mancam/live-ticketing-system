@@ -1,6 +1,8 @@
 import mysql.connector
 from constants import *
-
+import datetime
+import time
+import utils
 
 class DatabaseConnector:
     def __init__(self, host, user, password, database):
@@ -76,11 +78,19 @@ class DatabaseConnector:
 
     def read_data(self, table:str, columns:tuple|str, condition:str):
         res = []
+        if type(columns) is tuple:
+            columns = " ,".join(columns)
+        
         cursor = self.connection.cursor()
         try:
             cursor.execute(f"SELECT {columns} FROM {table} WHERE {condition}")
+            cols = cursor.column_names;
+            d_obj = {}
             for item in cursor:
-                res.append(item)
+                for name, value in zip(cols, item):
+                    d_obj[name] = value
+                res.append(d_obj)
+                d_obj = {}
             return res
         except mysql.connector.Error as err:
             self.connection.rollback()
@@ -102,21 +112,6 @@ class DatabaseConnector:
         cursor = self.connection.cursor()
         try:
             for col, val, id in zip(columns, values, id):
-               cursor.execute(f"UPDATE {table} SET {col} = {val} WHERE {tables_id_cols[table]} = {id}")
-            self.connection.commit()
-            print("Data updated successfully")
-        except mysql.connector.Error as err:
-            self.connection.rollback()
-            print("Error: {}".format(err))
-            return "Error: {}".format(err) , -1
-        
-    def update_data(self, table:str, data:list[tuple]): # (column, id, value)
-        tables_id_cols = DB_TABLE_PKS
-        data  = self._make_list(data)
-
-        cursor = self.connection.cursor()
-        try:
-            for col, val, id in data:
                cursor.execute(f"UPDATE {table} SET {col} = {val} WHERE {tables_id_cols[table]} = {id}")
             self.connection.commit()
             print("Data updated successfully")
@@ -156,19 +151,63 @@ class DBEndpoint(DatabaseConnector):
         if type(departments) is tuple:
             departments = [departments]
         return self.insert_data(TABLE_DEPARTMENTS, (COL_DEP_NAME), departments)
+    
+
+    def read_employees(self, cols = ("*",),  condition = None)->list[tuple]:       
+        if condition is None:
+            condition = f"{COL_EMP_ID} > 0" # this will select all the employees on the db
+        return self.read_data(TABLE_EMPLOYEES, cols, condition)
+    
+    def read_one_employee(self, id):
+        condition = f"{COL_EMP_ID} = {id}"
+        return self.read_employees(condition=condition)
+    
+    def read_employee_from_email(self, email) ->list[tuple]:
+        condition=  f"{COL_EMP_EMAIL} = '{email}'"
+        return self.read_employees(condition=condition)
+    
+    def read_departments(self, cols = ("*",),  condition = None)->list[tuple]:
+        if condition is None:
+            condition = f"{COL_DEP_ID} > 0" # this will return all departments
+        return self.read_data(TABLE_DEPARTMENTS, cols, condition)
+
+    def read_one_department(self, id)->list[tuple]:
+        condition = f"{COL_DEP_ID} = {id}"
+        return self.read_departments(condition=condition)
+    
+    def read_tasks(self, ticket_id)->list[tuple]:
+        condition = f"{COL_TAS_TICKET_ID} = {ticket_id}"
+        return self.read_data(TABLE_TASKS, ("*", ), condition)
+    
+    def read_tickets(self, cols = ("*",),  condition = None)->list[tuple]:
+        if condition is None:
+            condition = f"{COL_TIC_ID} > 0" # this will return all tickets
+        return self.read_data(TABLE_TICKETS, cols, condition)
+    
+    def read_one_ticket(self, ticket_id)->list[tuple]:
+        condition = f"{COL_TIC_ID} = {ticket_id}"
+        return self.read_tickets(condition=condition)
+    
+    def update_ticket_status(self, ticket_id, status):
+        return self.update_data(TABLE_TICKETS, COL_TIC_STATUS, ticket_id, status)
+
+    def update_ticket_department(self, ticket_id, department):
+        return self.update_data(TABLE_TICKETS, COL_TIC_DEPARTMENT, ticket_id, department)
+
+    def update_ticket_descrition(self, ticket_id, desc):
+        desc = f"'{desc}'"
+        return self.update_data(TABLE_TICKETS, COL_TIC_DESCRIPTION, ticket_id, desc)
+    
+    def close_ticket(self, ticket_id):
+        c_date = f"'{utils.get_current_date_string()}'"
+        self.update_data(TABLE_TICKETS, COL_TIC_CLOSE_DATE, ticket_id, c_date)
+        return self.update_ticket_status(ticket_id, STATUS_COMPLETE)
 
 
-
-
-
-
-
-
-
-
-
-
-
+def create_db_connector()->DBEndpoint:
+    connector = DBEndpoint(DB_HOST, DB_USER_NAME, DB_PASSWORD, DATABASE_NAME)
+    connector.connect()
+    return connector;
 
 
 # Example usage
@@ -192,8 +231,18 @@ if __name__ == "__main__":
                    ("HR",), 
                    ("Graphics",)
                    ]
+    
+    tasks = [
+        ("Please check the ticker on VR3 it's not working", 8, STATUS_OPEN, 1, "2023-09-28 10:04:03"),
+        ("Please check the ticker on VR3 it's not working", 8, STATUS_OPEN, 1, "2023-09-28 10:04:03"),
+        ("Please check the ticker on VR3 it's not working", 8, STATUS_OPEN, 1, "2023-09-28 10:04:03"),
+        ("Please check the ticker on VR3 it's not working", 9, STATUS_OPEN, 1, "2023-09-28 10:04:03"),
+    ]
 
-    cursor = db.insert_tickets(tickets)
+
+    db.insert_tasks(tasks)
+
+    cursor = db.close_ticket(8)
 
     print(cursor)
 

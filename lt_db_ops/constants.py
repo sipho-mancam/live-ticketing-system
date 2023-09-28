@@ -33,6 +33,7 @@ COL_TIC_START_DATE = 'start_date'
 COL_TIC_CLOSE_DATE = 'close_date'
 COL_TIC_DEPARTMENT = 'department' #FK --> Department ID
 COL_TIC_DESCRIPTION = 'description'
+COL_TIC_OWNER = 'owner' # FK --> Employees ID ... the person who opened the ticket
 
 
 DB_TABLE_PKS = {
@@ -46,3 +47,8 @@ DB_USER_NAME = 'root'
 DB_PASSWORD = 'seb4vision23'
 DB_HOST = 'localhost'
 
+STATUS_OPEN = 0
+STATUS_COMPLETE = 2
+STATUS_PRELIM_COMPLETE = 1
+
+TASKS = 'tasks'
