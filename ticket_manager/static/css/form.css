@@ -1,0 +1,15 @@
+
+
+body{
+    display: flex;
+    flex-flow: column ;
+}
+
+.create-ticket-header{
+    margin: auto;
+}
+
+.create-ticket-form{
+    width: 70%;
+    margin: 16px auto;
+}

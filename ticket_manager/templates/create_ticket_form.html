@@ -1,0 +1,38 @@
+{% extends "_base_2.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link href="{% static 'css/form.css'%}" rel="stylesheet"/>
+{% endblock extra_head %}
+
+{% block content %}
+
+<h1 class="create-ticket-header">Create Ticket: </h1>
+<form class="create-ticket-form" method="POST" action="/ticket_man/create_ticket/">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="inputGroupSelect01">Departments</label>
+        <select name="dept_name" class="form-select" id="inputGroupSelect01">
+          <option selected>Choose...</option>
+          <option value="1">R & D (Software)</option>
+          <option value="2">VR (Virtual Reality)</option>
+          <option value="3">AR (Augmented Reality)</option>
+          <option value="4">Operations</option>
+          <option value="5">Human Resources</option>
+          <option value="6">Graphics Design</option>
+          <option value="7">Hardware</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <span class="input-group-text">Ticket Description</span>
+        <textarea name="ticket_description" class="form-control" aria-label="With textarea" rows="10"></textarea>
+      </div>
+      <br />
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+    <button type="button" id="button-close-form" class="btn btn-danger">Cancel</button>
+</form>
+
+
+{% endblock content %}
