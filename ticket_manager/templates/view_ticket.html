@@ -28,12 +28,8 @@
             <div class="collapse multi-collapse" id="multiCollapseExample1">
                <ul class="list-group"> 
                 {% for task in ticket_info.tasks %}
-                    <li class="list-group-item list-group-item-action"> 
-                        <i class="bi bi-list"></i> 
-                        <span class="task-description">
-                            &emsp;{{ task.description }}&emsp;
-                        </span>
-
+                    <li class="list-group-item list-group-item-action" data-bs-toggle="collapse" data-bs-target=#li-{{ task.task_id }} aria-expanded="false" aria-controls={{ task.task_id }}> 
+                        <i class="bi bi-list"></i>  
                         {% if task.status == 0 %}
                             <span class="task-status">
                                 &emsp;<i class="bi bi-circle-fill" style="color: red;"></i> &nbsp;open
@@ -44,9 +40,38 @@
                             </span>
                         {% endif %}
 
-                        
+                        <span class="task-date">
+                            &emsp; {{ task.assigned_date }}
+                        </span>
+
+                        <span class="task-assignee">
+                            &emsp;&emsp; {{ task.assigned_to }}
+                        </span>
+
 
                     </li>
+                    <div class="col">
+                    <div class="collapse multi-collapse" id=li-{{ task.task_id }}>
+                        <div class="card card-body">
+                            <h5>Task Description: </h5>
+                            
+                            <span class="text-task_description">
+                                {{ task.description }}
+                            </span>
+
+                            <br /> <br />
+                            <span class="d-inline-flex gap-1">
+                                <button class="button-task-done btn btn-primary" data-task_id={{ task.task_id }} type="button">
+                                   {% if task.status == 0%}
+                                        Close Task
+                                    {% else %}
+                                        Re-open Task
+                                   {% endif %}
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    </div>
                 {% endfor %}    
                </ul>
             </div>

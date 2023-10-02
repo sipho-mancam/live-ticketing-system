@@ -37,9 +37,6 @@ def view_ticket(request:HttpRequest, id:int):
         
         if len(res) != 0:
             ticket = parse2JSON.create_ticket_json(res[0])
-            assignee_id =  ticket['assigned_to']
-            employee = connector.read_one_employee(assignee_id)
-            ticket['assigned_to'] = employee[0]['email']
             return render(request, 'view_ticket.html', {'ticket_info':ticket})
         return render(request, 'view_ticket.html', {})
     else:
