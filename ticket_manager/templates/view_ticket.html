@@ -44,12 +44,26 @@
                             </span>
                         {% endif %}
 
+                        
+
                     </li>
                 {% endfor %}    
                </ul>
             </div>
         </div>
     </div>
+    <br />
+    <p class="d-inline-flex gap-1">
+        <button id = "button-create-task" data-ticket_id = {{ ticket_info.ticket_id }} type="button" class="btn btn-primary">
+            Create New Task
+        </button>
+        <button id="button-close-tick" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-danger">
+            Close Ticket
+        </button>
+    </p>
+    
+   
+
 </div>
 
 
