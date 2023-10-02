@@ -1,0 +1,56 @@
+{% extends "_base_2.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link href="{% static 'css/ticket.css'%}" rel="stylesheet"/>
+{% endblock extra_head %}
+
+
+{% block content %}
+<div class="ticket-view">
+    <h1>Ticket Information</h1>
+    <div>
+        <pre><strong class="t-key">Ticket ID:</strong>      {{ ticket_info.ticket_id }}</pre>
+        <pre><span class="t-key">Assigned To:</span>    {{ ticket_info.assigned_to }}</pre>
+        <pre><span class="t-key">Status:</span>         {{ ticket_info.status }}</pre>
+        <pre><span class="t-key">Start Date:</span>     {{ ticket_info.start_date }}</pre>
+        <pre><span class="t-key">Close Date:</span>     {{ ticket_info.close_date }}</pre>
+        <pre><span class="t-key">Department:</span>     {{ ticket_info.department }}</pre>
+        <pre><span class="t-key">Description:</span>    {{ ticket_info.description }}</pre>
+    </div>
+
+    <br />
+
+    <h3 class="text" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Tasks   <i class="bi bi-caret-right"></i></h4>
+    
+    <div class="row">
+        <div class="col">
+            <div class="collapse multi-collapse" id="multiCollapseExample1">
+               <ul class="list-group"> 
+                {% for task in ticket_info.tasks %}
+                    <li class="list-group-item list-group-item-action"> 
+                        <i class="bi bi-list"></i> 
+                        <span class="task-description">
+                            &emsp;{{ task.description }}&emsp;
+                        </span>
+
+                        {% if task.status == 0 %}
+                            <span class="task-status">
+                                &emsp;<i class="bi bi-circle-fill" style="color: red;"></i> &nbsp;open
+                            </span>
+                        {% else %}
+                            <span class="task-status">
+                                &emsp;<i class="bi bi-circle-fill" style="color: green;"></i>&nbsp;close
+                            </span>
+                        {% endif %}
+
+                    </li>
+                {% endfor %}    
+               </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

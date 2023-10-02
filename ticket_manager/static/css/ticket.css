@@ -1,0 +1,14 @@
+
+
+.ticket-view{
+    border: 2px sold rgb(218, 188, 188);
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+    width:70%;
+    margin: auto;
+}
+
+.t-key{
+    font-weight: bolder;
+}

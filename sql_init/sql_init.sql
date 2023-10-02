@@ -1,3 +1,5 @@
+CREATE DATABASE live_ticketing_db;
+
 CREATE TABLE `live_ticketing_db`.`tickets` (
   `ticket_id` INT AUTO_INCREMENT PRIMARY KEY,
   `assigned_to` INT NULL,
@@ -32,8 +34,8 @@ CREATE TABLE `live_ticketing_db`.`tasks` (
     `assigned_date` DATETIME
 );
 
-ALTER TABLE `employees`
+ALTER TABLE `live_ticketing_db`.`employees`
   ADD UNIQUE INDEX `email_UNIQUE` (`email`);
 
-ALTER TABLE live_ticketing_db.department
+ALTER TABLE `live_ticketing_db`.`department`
 	ADD UNIQUE INDEX `dept_name_UNIQUE` (`dept_name`);

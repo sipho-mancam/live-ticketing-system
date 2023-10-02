@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from lt_db_ops import db_connector, utils, parse2JSON
+
 
 # Create your views here.
 
@@ -14,14 +15,34 @@ def default_view(request:HttpRequest)->HttpResponse:
 
 def create_ticket(request:HttpRequest)->HttpResponse:
     if request.method == 'GET':
-        return render(request, 'create_ticket_form.html', {})
+        if request.user.is_authenticated:
+            return render(request, 'create_ticket_form.html', {})
+        else:
+            return default_view(request)
     if request.method == 'POST':
         dept_name = request.POST['dept_name']
         ticket_descr = request.POST['ticket_description']
-
         connector = db_connector.create_db_connector()
 
-        connector.insert_tickets(())
-
-
+        connector.close_connection()
         return HttpResponse("We received a form submit request")
+    
+
+def view_ticket(request:HttpRequest, id:int):
+
+    if request.method == 'GET':
+        
+        connector = db_connector.create_db_connector()
+        res = connector.read_one_ticket(id)
+        
+        if len(res) != 0:
+            ticket = parse2JSON.create_ticket_json(res[0])
+            assignee_id =  ticket['assigned_to']
+            employee = connector.read_one_employee(assignee_id)
+            ticket['assigned_to'] = employee[0]['email']
+            return render(request, 'view_ticket.html', {'ticket_info':ticket})
+        return render(request, 'view_ticket.html', {})
+    else:
+        print("This is a post request")
+    
+    return HttpResponse(f"Viewing TIcket: {id}")

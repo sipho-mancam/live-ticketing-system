@@ -14,7 +14,7 @@
   <body>
     {% block body %}
 
-    {% if messages %}
+    <!-- {% if messages %}
     <div>
       <strong>{% trans "Messages:" %}</strong>
       <ul>
@@ -23,13 +23,12 @@
         {% endfor %}
       </ul>
     </div>
-    {% endif %}
+    {% endif %} -->
 
     <div class="menu-bar">
-      <strong>{% trans "Ticketing System" %}</strong>
+      <a href="{% url 'index' %}" style="text-decoration: none; color: grey;"><strong>{% trans "Ticketing System" %}</strong></a>
       <ul>
         {% if user.is_authenticated %}
-        <li><a href="{% url 'account_email' %}">{% trans "Change Email" %}</a></li>
         <li><a href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a></li>
         {% else %}
         <li>

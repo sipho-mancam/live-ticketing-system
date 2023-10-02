@@ -9,6 +9,7 @@ TABLE_TICKETS = 'tickets'
 #DEPARTMENTS COLUMNS
 COL_DEP_ID = 'dept_id'
 COL_DEP_NAME = 'dept_name'
+COL_DEP_MANAGER = 'manager'
 
 # EMPLOYEES COLUMNS
 COL_EMP_ID = 'employees_id'

@@ -12,7 +12,7 @@
     {% csrf_token %}
     <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Departments</label>
-        <select name="dept_name" class="form-select" id="inputGroupSelect01">
+        <select name="dept_name" class="form-select" id="inputGroupSelect01" required>
           <option selected>Choose...</option>
           <option value="1">R & D (Software)</option>
           <option value="2">VR (Virtual Reality)</option>
@@ -26,7 +26,7 @@
 
       <div class="input-group">
         <span class="input-group-text">Ticket Description</span>
-        <textarea name="ticket_description" class="form-control" aria-label="With textarea" rows="10"></textarea>
+        <textarea name="ticket_description" class="form-control" aria-label="With textarea" rows="10" required></textarea>
       </div>
       <br />
     <button type="submit" class="btn btn-primary">Submit</button>

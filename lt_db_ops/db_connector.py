@@ -148,9 +148,8 @@ class DBEndpoint(DatabaseConnector):
                                 tasks)
 
     def insert_department(self, departments:list|tuple):
-        if type(departments) is tuple:
-            departments = [departments]
-        return self.insert_data(TABLE_DEPARTMENTS, (COL_DEP_NAME), departments)
+        departments = self._make_list(departments) # departments is a list of ('department', manager_id)
+        return self.insert_data(TABLE_DEPARTMENTS, (COL_DEP_NAME, COL_DEP_MANAGER), departments)
     
 
     def read_employees(self, cols = ("*",),  condition = None)->list[tuple]:       

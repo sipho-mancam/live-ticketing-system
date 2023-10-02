@@ -179,6 +179,9 @@ MIDDLEWARE = [
     'ticket_manager.middleware.XFrameOptionsMiddleware',
 ]
 
+ACCOUNT_EMAIL_REQUIRED = True
+
+
 # Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
