@@ -17,12 +17,13 @@
         <thead>
             <tr>
             {% for key in tickets.0.keys %}
-                {% if key != 'tasks' %}
-                {% if key != 'ticket_id'%}
-                <th>{{ key }}</th>
-                {% else %}
-                <th>ID</th>
-                {% endif %}
+                {% if key != 'tasks' and key != 'description' %}
+                    {% if key != 'ticket_id'%}
+                    <th>{{ key }}</th>
+                    {% else %}
+                    <th>ID</th>
+                    {% endif %}
+                
                 {% endif %}
             {% endfor %}
             </tr>
@@ -31,9 +32,18 @@
             {% for ticket in tickets %}
             <tr class = 'ticket-row' data-ticket_id = {{ ticket.ticket_id }}>
                 {% for key, value in ticket.items %}
-                {% if key != 'tasks' %}
-                    <td>{{ value }}</td>
+                {% if key != 'tasks'  and key != 'description' %}
+                    {% if key == 'status'%}
+                         {% if value != 'Open' %}
+                            <td><i class="bi bi-circle-fill" style="color: green; font-size: smaller;"></i>&emsp;closed </td>
+                         {% else %}
+                            <td><i class="bi bi-circle-fill" style="color: red; font-size: smaller;"></i>&emsp;open</td>
+                         {% endif %}
+                    {% else%}
+                        <td>{{ value }}</td>
+                    {% endif %}
                 {% endif %}
+
                 {% endfor %}
             </tr>
             {% endfor %}

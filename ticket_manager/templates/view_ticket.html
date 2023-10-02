@@ -12,7 +12,7 @@
     <div>
         <pre><strong class="t-key">Ticket ID:</strong>      {{ ticket_info.ticket_id }}</pre>
         <pre><span class="t-key">Assigned To:</span>    {{ ticket_info.assigned_to }}</pre>
-        <pre><span class="t-key">Status:</span>         {{ ticket_info.status }}</pre>
+        <pre><span class="t-key">Status:</span>         {{ ticket_info.status }} {% if ticket_info.status != 'Open' %}<i class="bi bi-circle-fill" style="color: green; font-size: smaller;"></i>{% else %}<i class="bi bi-circle-fill" style="color: red; font-size: smaller;"></i>{% endif %}</pre>
         <pre><span class="t-key">Start Date:</span>     {{ ticket_info.start_date }}</pre>
         <pre><span class="t-key">Close Date:</span>     {{ ticket_info.close_date }}</pre>
         <pre><span class="t-key">Department:</span>     {{ ticket_info.department }}</pre>
@@ -32,11 +32,11 @@
                         <i class="bi bi-list"></i>  
                         {% if task.status == 0 %}
                             <span class="task-status">
-                                &emsp;<i class="bi bi-circle-fill" style="color: red;"></i> &nbsp;open
+                                &emsp;<i class="bi bi-circle-fill" style="color: red; font-size: smaller;"></i> &nbsp;open
                             </span>
                         {% else %}
                             <span class="task-status">
-                                &emsp;<i class="bi bi-circle-fill" style="color: green;"></i>&nbsp;close
+                                &emsp;<i class="bi bi-circle-fill" style="color: green; font-size: smaller;"></i>&nbsp;close
                             </span>
                         {% endif %}
 
