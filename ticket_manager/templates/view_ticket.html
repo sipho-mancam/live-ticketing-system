@@ -3,10 +3,19 @@
 
 {% block extra_head %}
 <link href="{% static 'css/ticket.css'%}" rel="stylesheet"/>
+<link href="{% static 'css/task.css'%}" rel="stylesheet"/>
 {% endblock extra_head %}
 
 
 {% block content %}
+
+<div class="task-view" id="create-task-overlay">
+    <button id="close-overlay" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-danger">
+        Close
+    </button>
+    <iframe  src="{% url 'create-task-form' ticket_id=ticket_info.ticket_id %}" width="80%" height="480"></iframe>
+</div>
+
 <div class="ticket-view">
     <h1>Ticket Information</h1>
     <div>
@@ -17,6 +26,7 @@
         <pre><span class="t-key">Close Date:</span>     {{ ticket_info.close_date }}</pre>
         <pre><span class="t-key">Department:</span>     {{ ticket_info.department }}</pre>
         <pre><span class="t-key">Description:</span>    {{ ticket_info.description }}</pre>
+        <pre><span class="t-key">Ticket Created by:</span>    {{ ticket_info.owner }}</pre>
     </div>
 
     <br />
@@ -61,7 +71,7 @@
 
                             <br /> <br />
                             <span class="d-inline-flex gap-1">
-                                <button class="button-task-done btn btn-primary" data-task_id={{ task.task_id }} type="button">
+                                <button class="button-task-done btn btn-primary" data-task_id={{ task.task_id }} data-task_status={{ task.status }} type="button">
                                    {% if task.status == 0%}
                                         Close Task
                                     {% else %}
@@ -86,10 +96,10 @@
             Close Ticket
         </button>
     </p>
-    
-   
-
 </div>
 
 
+
+
+<script src="{% static 'js/view_ticket.js' %}"></script>
 {% endblock content %}

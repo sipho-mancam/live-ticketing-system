@@ -7,7 +7,8 @@ CREATE TABLE `live_ticketing_db`.`tickets` (
   `start_date` DATETIME NULL,
   `close_date` DATETIME NULL,
   `department` INT NULL,
-  `description` VARCHAR(3072) NULL
+  `description` VARCHAR(3072) NULL,
+  `owner` INT NULL
 );
 
 CREATE TABLE `live_ticketing_db`.`employees` (

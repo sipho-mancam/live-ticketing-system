@@ -137,7 +137,7 @@ class DBEndpoint(DatabaseConnector):
         if type(tickets) is tuple:
             tickets = self._make_list(tickets)
         return self.insert_data(TABLE_TICKETS, 
-                                (COL_TIC_ASSIGNED_TO, COL_TIC_STATUS, COL_TIC_START_DATE, COL_TIC_CLOSE_DATE, COL_TIC_DEPARTMENT, COL_TIC_DESCRIPTION), 
+                                (COL_TIC_ASSIGNED_TO, COL_TIC_STATUS, COL_TIC_START_DATE, COL_TIC_CLOSE_DATE, COL_TIC_DEPARTMENT, COL_TIC_DESCRIPTION, COL_TIC_OWNER), 
                                 tickets)
 
     def insert_tasks(self, tasks:list|tuple):
@@ -146,6 +146,16 @@ class DBEndpoint(DatabaseConnector):
         return self.insert_data(TABLE_TASKS, 
                                 (COL_TAS_DESCRIPTION, COL_TAS_TICKET_ID, COL_TAS_STATUS, COL_TAS_ASSIGNED_TO, COL_TAS_ASSIGNED_DATE), 
                                 tasks)
+    
+    def create_task(self, ticket_id:int, assigned_to:int, description:str):
+        assigned_date = utils.get_current_date_string()
+        task = (description, ticket_id, STATUS_OPEN, assigned_to, assigned_date)
+        return self.insert_tasks(task)
+
+    def create_ticket(self, assign_to:int, department:int, description:str, owner:int):
+        start_date = utils.get_current_date_string()
+        ticket = (assign_to, STATUS_OPEN, start_date, None, department, description, owner)
+        return self.insert_tickets(ticket)
 
     def insert_department(self, departments:list|tuple):
         departments = self._make_list(departments) # departments is a list of ('department', manager_id)
@@ -189,6 +199,9 @@ class DBEndpoint(DatabaseConnector):
     
     def update_ticket_status(self, ticket_id, status):
         return self.update_data(TABLE_TICKETS, COL_TIC_STATUS, ticket_id, status)
+    
+    def update_task_status(self, task_id, status):
+        return self.update_data(TABLE_TASKS, COL_TAS_STATUS, task_id, status)
 
     def update_ticket_department(self, ticket_id, department):
         return self.update_data(TABLE_TICKETS, COL_TIC_DEPARTMENT, ticket_id, department)
@@ -201,6 +214,12 @@ class DBEndpoint(DatabaseConnector):
         c_date = f"'{utils.get_current_date_string()}'"
         self.update_data(TABLE_TICKETS, COL_TIC_CLOSE_DATE, ticket_id, c_date)
         return self.update_ticket_status(ticket_id, STATUS_COMPLETE)
+    
+    def close_task(self, task_id):
+        return self.update_task_status(task_id, STATUS_COMPLETE)
+    
+    def re_open_task(self, task_id):
+        return self.update_task_status(task_id, STATUS_OPEN)
 
 
 def create_db_connector()->DBEndpoint:

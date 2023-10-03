@@ -1,0 +1,30 @@
+{% extends "_base_3.html" %}
+{% load static %}
+
+
+{%block content %}
+
+<h1 class="create-ticket-header">Create Task: </h1>
+<form class="create-task-form" method="POST" action="/ticket_man/create_task/">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="inputGroupSelect01">Assign To: </label>
+        <select name="assign_to" class="form-select" id="inputGroupSelect01" required>
+          <option selected>Choose...</option>
+          {%for employee in ticket_info.employees %}
+            <option value= {{ employee.employees_id }} > {{ employee.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <input type="hidden" value={{ ticket_info.ticket_id }} name="ticket_id" />
+      <div class="input-group">
+        <span class="input-group-text">Task Description</span>
+        <textarea name="task_description" class="form-control" aria-label="With textarea" rows="10" required></textarea>
+      </div>
+      <br />
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+
+{% endblock content %}

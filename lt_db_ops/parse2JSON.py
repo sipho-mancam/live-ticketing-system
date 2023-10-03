@@ -35,6 +35,11 @@ def create_ticket_json(ticket: dict)->dict: # this will fetch all
     e = ticket[COL_TIC_ASSIGNED_TO]
     emp = db_connector.read_one_employee(e)
     ticket[COL_TIC_ASSIGNED_TO] = emp[0]['email']
+
+    e = ticket[COL_TIC_OWNER]
+    if e is not None:
+        emp = db_connector.read_one_employee(e)
+        ticket[COL_TIC_OWNER] = emp[0][COL_EMP_EMAIL]
     departments = db_connector.read_one_department(ticket[COL_TIC_DEPARTMENT])
     ticket[COL_TIC_DEPARTMENT] = departments[0][COL_DEP_NAME]
     tasks = db_connector.read_tasks(ticket_id)

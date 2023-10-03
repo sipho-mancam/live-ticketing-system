@@ -11,6 +11,9 @@ drop table live_ticketing_db.department;
 truncate table live_ticketing_db.employees;
 create table live_ticketing_db.department (dept_id int primary key auto_increment, dept_name VARCHAR(255) Not NULL, manager int not null); 
 
+ALTER TABLE	`live_ticketing_db`.`tickets`
+	ADD COLUMN `owner` INT NULL;
+
 INSERT INTO live_ticketing_db.department (dept_name, manager) VALUES
 ('Finance', 1),
 ('Human Resources', 2),

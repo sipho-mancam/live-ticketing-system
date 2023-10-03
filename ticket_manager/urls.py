@@ -5,4 +5,9 @@ urlpatterns = [
     path('', view=default_view, name='ticket_man'),
     path('create_ticket/', view=create_ticket, name='create-ticket'),
     path('view_ticket/<int:id>', view=view_ticket, name="view-ticket"),
+    path('close_task/<int:id>', view=close_task, name='close-task'),
+    path('close_ticket/<int:id>', view=close_ticket, name='close-ticket'),
+    path('re_open_task/<int:id>', view=re_open_task, name='re-open-task'),
+    path('create_task/<int:ticket_id>', view=create_task_form, name='create-task-form'),
+    path('create_task/', view=create_task, name='create-task'),
 ]

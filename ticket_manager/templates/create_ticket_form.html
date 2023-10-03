@@ -12,15 +12,10 @@
     {% csrf_token %}
     <div class="input-group mb-3">
         <label class="input-group-text" for="inputGroupSelect01">Departments</label>
-        <select name="dept_name" class="form-select" id="inputGroupSelect01" required>
-          <option selected>Choose...</option>
-          <option value="1">R & D (Software)</option>
-          <option value="2">VR (Virtual Reality)</option>
-          <option value="3">AR (Augmented Reality)</option>
-          <option value="4">Operations</option>
-          <option value="5">Human Resources</option>
-          <option value="6">Graphics Design</option>
-          <option value="7">Hardware</option>
+        <select name="dept_id" class="form-select" id="inputGroupSelect01" required>
+         {% for department in departments %}
+          <option value={{ department.dept_id }} >{{ department.dept_name }}</option>
+         {% endfor %}
         </select>
       </div>
 

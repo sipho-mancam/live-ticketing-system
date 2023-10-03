@@ -29,6 +29,7 @@
       <a href="{% url 'index' %}" style="text-decoration: none; color: grey;"><strong>{% trans "Ticketing System" %}</strong></a>
       <ul>
         {% if user.is_authenticated %}
+        <li> <em style="text-decoration: underline; font-weight: bold;"><i class="bi bi-person-fill"></i>{{ user.email }}</em></li>
         <li><a href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a></li>
         {% else %}
         <li>
