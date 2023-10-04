@@ -10,4 +10,6 @@ urlpatterns = [
     path('re_open_task/<int:id>', view=re_open_task, name='re-open-task'),
     path('create_task/<int:ticket_id>', view=create_task_form, name='create-task-form'),
     path('create_task/', view=create_task, name='create-task'),
+    path('reassign_ticket/', view=re_assign_ticket, name='re-assign-ticket'),
+    path('delete_task/<int:task_id>', view=delete_task, name='delete-task'),
 ]

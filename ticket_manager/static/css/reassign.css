@@ -1,0 +1,16 @@
+.re-assign-view{
+    background-color: white;
+    display: block;
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+}
+
+#close-overlay-2{
+    width: fit-content;
+}
+
+
+.delete-task-bin::hover{
+    color: red;
+}

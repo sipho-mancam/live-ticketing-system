@@ -18,6 +18,17 @@ for(const button of task_buttons){
         });
 }
 
+const delete_task_buttons = document.getElementsByClassName("delete-task-bin");
+
+for(const bin of delete_task_buttons){
+    bin.addEventListener('click', (e)=>{
+       const task_id = e.target.dataset.task_id;
+       const origin = document.location['origin'];
+       const path = '/ticket_man/delete_task/'+String(task_id)
+       window.location = origin + path;
+    });
+}
+
 
 const create_task_form_button = document.getElementById('button-create-task');
 const create_task_form_overlay = document.getElementById('create-task-overlay');
@@ -31,5 +42,16 @@ close_overlay.addEventListener('click', (e)=>{
     
     create_task_form_overlay.style.display = 'none';
     window.location.reload()
-    
 })
+
+const re_assign_ticket_button = document.getElementById("button-reassign-tick");
+const re_assign_ticket_overlay = document.getElementById("re-assign-ticket-overlay");
+const re_assign_close_overlay = document.getElementById("close-overlay-2");
+
+re_assign_ticket_button.addEventListener('click', (e)=>{
+    re_assign_ticket_overlay.style.display = 'flex';
+});
+
+re_assign_close_overlay.addEventListener('click', (e)=>{
+    re_assign_ticket_overlay.style.display = 'none';
+});

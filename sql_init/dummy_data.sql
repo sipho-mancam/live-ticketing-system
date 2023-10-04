@@ -7,8 +7,10 @@ select * from live_ticketing_db.tickets;
 delete from live_ticketing_db.department where dept_id > 0;
 delete from live_ticketing_db.employees where employees_id > 0;
 
-drop table live_ticketing_db.department;
-truncate table live_ticketing_db.employees;
+-- truncate table live_ticketing_db.department;
+-- truncate table live_ticketing_db.employees;
+-- truncate table live_ticketing_db.tasks;
+-- truncate table live_ticketing_db.tickets;
 create table live_ticketing_db.department (dept_id int primary key auto_increment, dept_name VARCHAR(255) Not NULL, manager int not null); 
 
 ALTER TABLE	`live_ticketing_db`.`tickets`
@@ -39,6 +41,9 @@ VALUES
 ('Employee2', 'employee2@example.com', 2, 'Employee'),
 ('Employee3', 'employee3@example.com', 3, 'Employee'),
 ('Employee4', 'employee4@example.com', 4, 'Employee');
+
+INSERT INTO `live_ticketing_db`.`employees` (name, email, department, position) 
+	VALUES ('sipho-mancam', 'siphom@seb4vision.co.za', 1, 'Software Developer');
 
 
 INSERT INTO tickets (assigned_to, status, start_date, close_date, department, description)

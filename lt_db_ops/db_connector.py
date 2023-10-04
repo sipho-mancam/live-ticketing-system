@@ -120,6 +120,20 @@ class DatabaseConnector:
             print("Error: {}".format(err))
             return "Error: {}".format(err) , -1
         
+    def delete_data(self, table:str, condition:str):
+        tables_id_cols = DB_TABLE_PKS
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute(f"DELETE FROM {table} WHERE {condition}")
+            self.connection.commit()
+            print("Record Deleted Successfully")
+            return cursor
+        except mysql.connector.Error as err:
+            self.connection.rollback()
+            print(f"Error: {err}")
+            return f"Error: {err}", -1
+
+        
 
 class DBEndpoint(DatabaseConnector):
     def __init__(self, host, user, password, database):
@@ -184,13 +198,17 @@ class DBEndpoint(DatabaseConnector):
         condition = f"{COL_DEP_ID} = {id}"
         return self.read_departments(condition=condition)
     
+    def read_department_by_name(self, name:str)->list[tuple]:
+        condition = f"{COL_DEP_NAME} = '{name}'"
+        return self.read_departments(condition=condition)
+    
     def read_tasks(self, ticket_id)->list[tuple]:
-        condition = f"{COL_TAS_TICKET_ID} = {ticket_id}"
+        condition = f"{COL_TAS_TICKET_ID} = {ticket_id} ORDER BY status ASC, assigned_date DESC"
         return self.read_data(TABLE_TASKS, ("*", ), condition)
     
     def read_tickets(self, cols = ("*",),  condition = None)->list[tuple]:
         if condition is None:
-            condition = f"{COL_TIC_ID} > 0" # this will return all tickets
+            condition = f"{COL_TIC_ID} > 0 ORDER BY start_date DESC" # this will return all tickets
         return self.read_data(TABLE_TICKETS, cols, condition)
     
     def read_one_ticket(self, ticket_id)->list[tuple]:
@@ -210,6 +228,9 @@ class DBEndpoint(DatabaseConnector):
         desc = f"'{desc}'"
         return self.update_data(TABLE_TICKETS, COL_TIC_DESCRIPTION, ticket_id, desc)
     
+    def re_assign_ticket(self, ticket_id, emp_id):
+        return self.update_data(TABLE_TICKETS, COL_TIC_ASSIGNED_TO, ticket_id, emp_id)
+    
     def close_ticket(self, ticket_id):
         c_date = f"'{utils.get_current_date_string()}'"
         self.update_data(TABLE_TICKETS, COL_TIC_CLOSE_DATE, ticket_id, c_date)
@@ -221,6 +242,10 @@ class DBEndpoint(DatabaseConnector):
     def re_open_task(self, task_id):
         return self.update_task_status(task_id, STATUS_OPEN)
 
+    def delete_task(self, task_id):
+        condition = f"{COL_TAS_ID} = {task_id}"
+        return self.delete_data(TABLE_TASKS, condition)
+    
 
 def create_db_connector()->DBEndpoint:
     connector = DBEndpoint(DB_HOST, DB_USER_NAME, DB_PASSWORD, DATABASE_NAME)

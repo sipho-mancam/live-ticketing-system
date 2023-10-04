@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,6 +27,10 @@ SECRET_KEY = 'django-insecure-a!)et4d-fmb5%017@@7q+o=d6y=xhd^%50hco+j3uq^1qp6%!7
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+
+SASS_PROCESSOR_ROOT = os.path.join(BASE_DIR, 'static')
+SASS_OUTPUT_STYLE = 'compressed'  # Options: 'nested', 'expanded', 'compact', 'compressed'
 
 
 # Application definition

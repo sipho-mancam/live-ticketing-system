@@ -4,6 +4,7 @@
 {% block extra_head %}
 <link href="{% static 'css/ticket.css'%}" rel="stylesheet"/>
 <link href="{% static 'css/task.css'%}" rel="stylesheet"/>
+<link href="{% static 'css/reassign.css'%}" rel="stylesheet"/>
 {% endblock extra_head %}
 
 
@@ -14,6 +15,30 @@
         Close
     </button>
     <iframe  src="{% url 'create-task-form' ticket_id=ticket_info.ticket_id %}" width="80%" height="480"></iframe>
+</div>
+
+<div class="task-view" id="re-assign-ticket-overlay">
+    <button id="close-overlay-2" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-danger">
+        Close
+    </button>
+    <div class="re-assign-view">
+        <h1 class="assign-ticket">Re-Assign Ticket: </h1>
+        <form class="re-assign-ticket-form" method="POST" action="/ticket_man/reassign_ticket/">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="inputGroupSelect01">Assign To: </label>
+                <select name="assign_to" class="form-select" id="inputGroupSelect01" required>
+                <option selected>Choose...</option>
+                {%for employee in employees %}
+                    <option value= {{ employee.employees_id }} > {{ employee.name }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" value={{ ticket_info.ticket_id }} name="ticket_id" />
+            <button type="submit" class="btn btn-primary">Assign</button>
+        </form>
+    </div>
+    
 </div>
 
 <div class="ticket-view">
@@ -31,7 +56,8 @@
 
     <br />
 
-    <h3 class="text" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Tasks   <i class="bi bi-caret-right"></i></h4>
+    {% if is_employee %}
+    <h4 class="text" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Tasks <i style="font-size: medium;" class="bi bi-caret-right"></i></h4>
     
     <div class="row">
         <div class="col">
@@ -57,8 +83,12 @@
                         <span class="task-assignee">
                             &emsp;&emsp; {{ task.assigned_to }}
                         </span>
-
-
+                        
+                        {% if is_manager or can_create_task %}
+                        <span class="delete-task-bin" data-task_id = {{ task.task_id }}>
+                            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<i data-task_id = {{ task.task_id }} class="bi bi-trash3-fill"></i>
+                        </span>
+                        {% endif %}
                     </li>
                     <div class="col">
                     <div class="collapse multi-collapse" id=li-{{ task.task_id }}>
@@ -71,6 +101,7 @@
 
                             <br /> <br />
                             <span class="d-inline-flex gap-1">
+                                {% if task.assigned_to == user.email %}
                                 <button class="button-task-done btn btn-primary" data-task_id={{ task.task_id }} data-task_status={{ task.status }} type="button">
                                    {% if task.status == 0%}
                                         Close Task
@@ -78,10 +109,13 @@
                                         Re-open Task
                                    {% endif %}
                                 </button>
+                                {% endif %}
                             </span>
                         </div>
                     </div>
                     </div>
+                    {% empty %}
+                    <li>There are no tasks in the list</li>
                 {% endfor %}    
                </ul>
             </div>
@@ -89,17 +123,27 @@
     </div>
     <br />
     <p class="d-inline-flex gap-1">
+        {% if can_create_task or is_manager %}
         <button id = "button-create-task" data-ticket_id = {{ ticket_info.ticket_id }} type="button" class="btn btn-primary">
             Create New Task
         </button>
+        {% endif %}
+
+        {% if is_manager %}
+        <button id="button-reassign-tick" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-success">
+            Re-assign Ticket
+        </button>
+        {% endif %}
+
+        {% if can_close_ticket %}
         <button id="button-close-tick" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-danger">
             Close Ticket
         </button>
+        {% endif %}
+       
     </p>
+    {% endif %}
 </div>
-
-
-
 
 <script src="{% static 'js/view_ticket.js' %}"></script>
 {% endblock content %}
