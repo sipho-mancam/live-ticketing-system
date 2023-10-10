@@ -3,15 +3,9 @@
 
 {%block content%}
 
-<p>A new ticket with id:#{{ ticket_id }} has been assigned to {{ recipient_name }}.</p>
+<p>You have been assigned a new ticket with id:#{{ ticket_id }} at: {{ timestamp }}</p>
 
-<button id="button-ticket-history" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-success">
-    Accept
-</button>
-
-<button id="button-close-tick" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-danger">
-    Decline
-</button>
+<p>Go to the website to view the ticket</p>
 
 
 {% endblock content %}

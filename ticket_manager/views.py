@@ -2,10 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from lt_db_ops import db_connector, utils, parse2JSON, constants
 from .emails import start_mail_runner
-
+import threading
 #from pprint import pprint
 
-import threading
 # Create your views here.
 
 # start the emailing service
@@ -19,7 +18,7 @@ def default_view(request:HttpRequest)->HttpResponse:
     # html_template = 'emails/task_assigned.html'
     # context = {'name': 'No Reply'}
     # to_emails = ['siphom@seb4vision.co.za']
-    # send_html_email(subject, html_template, context, to_emails)
+    # send_html_email(subject, html_template, context, to_emails
    
     if request.user.is_authenticated:
         context = {}
@@ -130,6 +129,16 @@ def re_assign_ticket(request:HttpRequest):
         ticket_id = f_data['ticket_id']
         connector = db_connector.create_db_connector()
         connector.re_assign_ticket(ticket_id, assign_to)
+
+        #Email record this will schedule an email to be sent to the department manager
+        subject = constants.SUBJECT_TICKET_ASSIGNED
+        template_id = connector.get_template_id(constants.TEMPLATE_TASK_ASSIGNED)
+        recipient = assign_to
+        ticket = ticket_id
+        status = constants.EMAIL_RECORD_STATUS_PENDING
+        actuator = request.user.email
+        connector.append_mail_record(subject, template_id, recipient, ticket, status, actuator)
+
 
         # Tick was reassigned --> let's add an event for it.
         action_id = connector.get_action_id(constants.ACTION_ASSIGNED)

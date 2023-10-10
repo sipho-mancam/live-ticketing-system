@@ -4,6 +4,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import live_ticketing_system.settings as settings
+import pathlib
 
 @shared_task
 def send_html_email(subject, html_template, context, to_emails):
@@ -19,7 +20,6 @@ def send_html_email(subject, html_template, context, to_emails):
         to=to_emails
     )
     email.attach_alternative(html_content, "text/html")
-
     # Send the email
     email.send()
 
