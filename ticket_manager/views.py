@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from lt_db_ops import db_connector, utils, parse2JSON, constants
-from .emails import send_html_email_async, start_mail_runner
-from .tasks import send_html_email
+from .emails import start_mail_runner
 
-from pprint import pprint
+#from pprint import pprint
 
 import threading
 # Create your views here.
-# mail_thread = threading.Thread(target=start_mail_runner)
 
-# mail_thread.start()
+# start the emailing service
+mail_thread = threading.Thread(target=start_mail_runner)
+mail_thread.start()
 
 
 def default_view(request:HttpRequest)->HttpResponse:
@@ -19,8 +19,8 @@ def default_view(request:HttpRequest)->HttpResponse:
     # html_template = 'emails/task_assigned.html'
     # context = {'name': 'No Reply'}
     # to_emails = ['siphom@seb4vision.co.za']
-
     # send_html_email(subject, html_template, context, to_emails)
+   
     if request.user.is_authenticated:
         context = {}
         connector = db_connector.create_db_connector()
@@ -66,7 +66,7 @@ def create_ticket(request:HttpRequest)->HttpResponse:
             ticket = ticket_id
             status = constants.EMAIL_RECORD_STATUS_PENDING
             actuator = request.user.email
-            print(connector.append_mail_record(subject, template_id, recipient, ticket, status, actuator).lastrowid)
+            connector.append_mail_record(subject, template_id, recipient, ticket, status, actuator).lastrowid
 
             # Ticket was created, we need to log an event for this
             action_id = connector.get_action_id(constants.ACTION_CREATED)
@@ -202,6 +202,15 @@ def create_task(request:HttpRequest):
     if assigned_to is not None and ticket_id is not None and task_description is not None:
         connector = db_connector.create_db_connector()
         connector.create_task(ticket_id, assigned_to, task_description)
+
+        #Email record this will schedule an email to be sent to the department manager
+        subject = constants.SUBJECT_TASK_ASSIGNED
+        template_id = connector.get_template_id(constants.TEMPLATE_TASK_ASSIGNED)
+        recipient = assigned_to
+        ticket = ticket_id
+        status = constants.EMAIL_RECORD_STATUS_PENDING
+        actuator = request.user.email
+        connector.append_mail_record(subject, template_id, recipient, ticket, status, actuator)
 
         action_id = connector.get_action_id(constants.ACTION_ASSIGNED)
         object_id = connector.get_object_id(constants.OBJECT_TASK)

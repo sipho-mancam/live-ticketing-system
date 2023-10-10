@@ -90,7 +90,7 @@ class DatabaseConnector:
                 cursor.execute(f"SELECT {columns} FROM {table} WHERE {condition}")
             else:
                 cursor.execute(query)
-                
+
             cols = cursor.column_names;
             d_obj = {}
             for item in cursor:
@@ -196,6 +196,29 @@ class DBEndpoint(DatabaseConnector):
         return self.insert_data(TABLE_EMAIL_RECORDS, 
                                 (COL_ER_SUBJECT, COL_ER_TEMPLATE, COL_ER_RECIPIENT, COL_ER_TICKET_ID, COL_ER_STATUS, COL_ER_ACTUATOR),
                                 record)
+    
+    def get_unsent_records(self):
+        query = f"""SELECT 
+                    er.email_id,
+                    er.subject,
+                    er.ticket_id,
+                    er.actuator,
+                    e.name as recipient_name,
+                    e.email as recipient_email,
+                    et.template_name as template,
+                    er.time_stamp
+                FROM live_ticketing_db.email_records er
+                JOIN live_ticketing_db.employees e ON e.employees_id = er.recipient
+                JOIN live_ticketing_db.email_templates et ON et.id = er.template
+                WHERE er.status = 0;"""
+        return self.read_data(query=query)
+    
+    def update_unsent_to_sent_batch(self, ids:list|int):
+        ids = self._make_list(ids)
+        for id in ids:
+            self.update_data(TABLE_EMAIL_RECORDS, COL_ER_STATUS, id, EMAIL_RECORD_STATUS_SENT)
+        
+        return None
 
     def get_template_id(self, template_name):
         condition = f"{COL_ET_TEMPLATE_NAME} = '{template_name}'"
