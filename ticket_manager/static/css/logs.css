@@ -1,0 +1,17 @@
+.log{
+    margin: 0;
+    /* border-bottom: 1px solid rgb(84, 84, 84) ; */
+    /* border-top: 1px solid rgb(84, 84, 84); */
+}
+
+hr{
+    margin: 0px;
+}
+
+.logs-container{
+    border: 2px solid rgb(84, 84, 84);
+    margin: 10px;
+    margin-top: 0px;
+    padding: 0px;
+    height: 85%;
+}

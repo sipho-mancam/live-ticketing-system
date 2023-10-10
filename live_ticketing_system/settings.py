@@ -32,6 +32,19 @@ ALLOWED_HOSTS = []
 SASS_PROCESSOR_ROOT = os.path.join(BASE_DIR, 'static')
 SASS_OUTPUT_STYLE = 'compressed'  # Options: 'nested', 'expanded', 'compact', 'compressed'
 
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'noreply@seb4vision.co.za'
+EMAIL_HOST_PASSWORD = 'Seb4vision23'
+DEFAULT_FROM_EMAIL = 'noreply@seb4vision.co.za'
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
 
 # Application definition
 

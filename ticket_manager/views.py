@@ -1,15 +1,30 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from lt_db_ops import db_connector, utils, parse2JSON, constants
+from .emails import send_html_email_async, start_mail_runner
+from .tasks import send_html_email
 
 from pprint import pprint
 
+import threading
 # Create your views here.
+# mail_thread = threading.Thread(target=start_mail_runner)
+
+# mail_thread.start()
+
 
 def default_view(request:HttpRequest)->HttpResponse:
+    #Define the subject, HTML template, context, and recipients
+    # subject = 'Test Mailing Service'
+    # html_template = 'emails/task_assigned.html'
+    # context = {'name': 'No Reply'}
+    # to_emails = ['siphom@seb4vision.co.za']
+
+    # send_html_email(subject, html_template, context, to_emails)
     if request.user.is_authenticated:
         context = {}
         connector = db_connector.create_db_connector()
+
         tickets = connector.read_tickets()
         tickets = parse2JSON.parse_tickets(tickets)
         user = request.user
@@ -40,10 +55,24 @@ def create_ticket(request:HttpRequest)->HttpResponse:
             connector = db_connector.create_db_connector()
             dept = connector.read_one_department(dept_id)
             dept_manager = dept[0][constants.COL_DEP_MANAGER]
-            print(request.user.email)
             owner = connector.read_employee_from_email(request.user.email)
             owner_id = owner[0][constants.COL_EMP_ID]
-            connector.create_ticket(dept_manager, dept_id, ticket_descr, owner_id)
+            ticket_id = connector.create_ticket(dept_manager, dept_id, ticket_descr, owner_id).lastrowid
+
+            #Email record this will schedule an email to be sent to the department manager
+            subject = constants.SUBJECT_TICKET_ASSIGNED
+            template_id = connector.get_template_id(constants.TEMPLATE_TICKET_ASSIGNED)
+            recipient = dept_manager
+            ticket = ticket_id
+            status = constants.EMAIL_RECORD_STATUS_PENDING
+            actuator = request.user.email
+            print(connector.append_mail_record(subject, template_id, recipient, ticket, status, actuator).lastrowid)
+
+            # Ticket was created, we need to log an event for this
+            action_id = connector.get_action_id(constants.ACTION_CREATED)
+            object_id = connector.get_object_id(constants.OBJECT_TICKET)
+            employee_d = owner_id
+            connector.add_event(ticket_id, object_id, action_id, employee_d)
             connector.close_connection()
 
             return default_view(request)
@@ -59,12 +88,15 @@ def view_ticket(request:HttpRequest, id:int):
     if request.method == 'GET':
         connector = db_connector.create_db_connector()
         res = connector.read_one_ticket(id)
+        events = connector.read_event_data(id)
+        print(events)
         context = {}
         employee  = []
         user = request.user
         if user.email is not None:
             employee = connector.read_employee_from_email(user.email)
         context['is_employee'] = len(employee) > 0
+        context['events'] = events
  
         if len(res) != 0:
             ticket = parse2JSON.create_ticket_json(res[0])
@@ -98,6 +130,12 @@ def re_assign_ticket(request:HttpRequest):
         ticket_id = f_data['ticket_id']
         connector = db_connector.create_db_connector()
         connector.re_assign_ticket(ticket_id, assign_to)
+
+        # Tick was reassigned --> let's add an event for it.
+        action_id = connector.get_action_id(constants.ACTION_ASSIGNED)
+        object_id = connector.get_object_id(constants.OBJECT_TICKET)
+        connector.add_event(ticket_id, object_id, action_id, assign_to)
+
         connector.close_connection()
     r_url = request.headers['Referer']
     return redirect(r_url)
@@ -107,20 +145,49 @@ def close_task(request:HttpRequest, id:int):
     task_id = id
     connector = db_connector.create_db_connector()
     connector.close_task(task_id);  
+
+    #event 
+    task = connector.read_one_task(task_id)
+    ticket_id = task[0][constants.COL_TAS_TICKET_ID]
+    employeeid = task[0][constants.COL_TAS_ASSIGNED_TO]
+    object_id = connector.get_object_id(constants.OBJECT_TASK)
+    action_id = connector.get_action_id(constants.ACTION_CLOSED)
+    connector.add_event(ticket_id, object_id, action_id, employeeid)
+
+    connector.close_connection()
+
     return redirect(request.headers['Referer'])
 
 def re_open_task(request:HttpRequest, id:int):
     task_id = id
     connector = db_connector.create_db_connector()
-    connector.re_open_task(task_id);  
+    connector.re_open_task(task_id); 
+
+    #event 
+    task = connector.read_one_task(task_id)
+    ticket_id = task[0][constants.COL_TAS_TICKET_ID]
+    employeeid = task[0][constants.COL_TAS_ASSIGNED_TO]
+    object_id = connector.get_object_id(constants.OBJECT_TASK)
+    action_id = connector.get_action_id(constants.ACTION_OPENED)
+    connector.add_event(ticket_id, object_id, action_id, employeeid)
+
+    connector.close_connection()
     return redirect(request.headers['Referer'])
 
 def delete_task(request:HttpRequest, task_id:int):
     r_url = request.headers['Referer']
     connector = db_connector.create_db_connector()
-    connector.delete_task(task_id)
-    connector.close_connection()
 
+    #event 
+    task = connector.read_one_task(task_id)
+    ticket_id = task[0][constants.COL_TAS_TICKET_ID]
+    employeeid = task[0][constants.COL_TAS_ASSIGNED_TO]
+    object_id = connector.get_object_id(constants.OBJECT_TASK)
+    action_id = connector.get_action_id(constants.ACTION_DELETED)
+    connector.add_event(ticket_id, object_id, action_id, employeeid)
+    connector.delete_task(task_id)
+
+    connector.close_connection()
     return redirect(r_url)
 
 def close_ticket(request:HttpRequest, id:int):
@@ -135,6 +202,11 @@ def create_task(request:HttpRequest):
     if assigned_to is not None and ticket_id is not None and task_description is not None:
         connector = db_connector.create_db_connector()
         connector.create_task(ticket_id, assigned_to, task_description)
+
+        action_id = connector.get_action_id(constants.ACTION_ASSIGNED)
+        object_id = connector.get_object_id(constants.OBJECT_TASK)
+        connector.add_event(ticket_id, object_id, action_id, assigned_to)
+
         connector.close_connection()
 
     return render(request, 'response.html', {})

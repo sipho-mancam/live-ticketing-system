@@ -1,20 +1,24 @@
 
-select * from live_ticketing_db.department;
-select * from live_ticketing_db.employees;
-select * from live_ticketing_db.tasks;
-select * from live_ticketing_db.tickets;
+-- select * from live_ticketing_db.department;
+-- select * from live_ticketing_db.employees;
+-- select * from live_ticketing_db.tasks;
+-- select * from live_ticketing_db.tickets;
 
-delete from live_ticketing_db.department where dept_id > 0;
-delete from live_ticketing_db.employees where employees_id > 0;
+-- delete from live_ticketing_db.department where dept_id > 0;
+-- delete from live_ticketing_db.employees where employees_id > 0;
 
 -- truncate table live_ticketing_db.department;
 -- truncate table live_ticketing_db.employees;
 -- truncate table live_ticketing_db.tasks;
 -- truncate table live_ticketing_db.tickets;
-create table live_ticketing_db.department (dept_id int primary key auto_increment, dept_name VARCHAR(255) Not NULL, manager int not null); 
+-- create table live_ticketing_db.department (dept_id int primary key auto_increment, dept_name VARCHAR(255) Not NULL, manager int not null); 
 
-ALTER TABLE	`live_ticketing_db`.`tickets`
-	ADD COLUMN `owner` INT NULL;
+-- ALTER TABLE	`live_ticketing_db`.`tickets`
+-- 	ADD COLUMN `owner` INT NULL;
+    
+-- update `live_ticketing_db`.`department`
+-- 	set `manager` = (select employees.employees_id from live_ticketing_db.employees where employees.email = 'employee4@example.com')
+--     where department.dept_id > 1 and department.dept_id < 5;
 
 INSERT INTO live_ticketing_db.department (dept_name, manager) VALUES
 ('Finance', 1),
@@ -33,14 +37,14 @@ VALUES
 ('Manager2', 'manager2@example.com', 2, 'Manager'),
 ('Manager3', 'manager3@example.com', 3, 'Manager'),
 ('Manager4', 'manager4@example.com', 4, 'Manager'),
-('Manager5', 'manager5@example.com', 5, 'Manager'),
+('sipho-mancam', 'siphom@seb4vision.co.za', 5, 'Software Developer'),
 ('Manager6', 'manager6@example.com', 6, 'Manager'),
 ('Manager7', 'manager7@example.com', 7, 'Manager'),
 ('Manager8', 'manager8@example.com', 8, 'Manager'),
 ('Employee1', 'employee1@example.com', 1, 'Employee'),
 ('Employee2', 'employee2@example.com', 2, 'Employee'),
 ('Employee3', 'employee3@example.com', 3, 'Employee'),
-('Employee4', 'employee4@example.com', 4, 'Employee');
+('sipho-mancam', 'siphomancam2@seb4vision.co.za', 4, 'Software Developer');
 
 INSERT INTO `live_ticketing_db`.`employees` (name, email, department, position) 
 	VALUES ('sipho-mancam', 'siphom@seb4vision.co.za', 1, 'Software Developer');

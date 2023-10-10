@@ -11,6 +11,7 @@ class DatabaseConnector:
         self.password = password
         self.database = database
         self.connection = None
+        self.table_id_cols = DB_TABLE_PKS
 
     def connect(self):
         try:
@@ -74,21 +75,71 @@ class DatabaseConnector:
             return "Error: {}".format(err) , -1
             
         finally:
+            return cursor
             cursor.close()
+            
 
-    def read_data(self, table:str, columns:tuple|str, condition:str):
+    def read_data(self, table:str=None, columns:tuple|str=None, condition:str=None, query=None):
         res = []
         if type(columns) is tuple:
             columns = " ,".join(columns)
         
         cursor = self.connection.cursor()
         try:
-            cursor.execute(f"SELECT {columns} FROM {table} WHERE {condition}")
+            if query is None:
+                cursor.execute(f"SELECT {columns} FROM {table} WHERE {condition}")
+            else:
+                cursor.execute(query)
+                
             cols = cursor.column_names;
             d_obj = {}
             for item in cursor:
                 for name, value in zip(cols, item):
                     d_obj[name] = value
+                res.append(d_obj)
+                d_obj = {}
+            return res
+        except mysql.connector.Error as err:
+            self.connection.rollback()
+            print("Error: {}".format(err))
+            return "Error: {}".format(err) , -1
+    
+    def get_id_by_name(self, table, condition):
+        id_col = self.table_id_cols[table]
+        columns = (f"{id_col}", )
+        if id_col is not None:
+            data = self.read_data(table, columns, condition)
+            if type(data) is list:
+                return data[0]
+        return {}
+
+    def read_event_data(self, ticket_id):
+        res = []
+        
+        cursor = self.connection.cursor()
+        try:
+            cursor.execute("SELECT " 
+                                "et.time_stamp, "
+                                "et.ticket_id, "
+                                "eo.object_name, "
+                                "ea.action_name, "
+                                "e.name, "
+                                "e.employees_id "
+                            "FROM events_tracker et "
+                            "JOIN tickets t ON t.ticket_id = et.ticket_id "
+                            "JOIN employees e ON e.employees_id = et.employee_id "
+                            "JOIN event_action ea ON ea.action_id = et.action "
+                            "JOIN event_objects eo ON eo.object_id = et.object "
+                            "WHERE et.ticket_id = {} ORDER BY et.time_stamp DESC; ".format(ticket_id))
+            cols = cursor.column_names;
+            d_obj = {}
+            for item in cursor:
+                for name, value in zip(cols, item):
+                    if name == 'time_stamp':
+                        d_obj[name] = value.__str__()
+                    else:
+                        d_obj[name] = value
+
                 res.append(d_obj)
                 d_obj = {}
             return res
@@ -139,6 +190,24 @@ class DBEndpoint(DatabaseConnector):
     def __init__(self, host, user, password, database):
         super().__init__(host, user, password, database)
 
+    def insert_email_record(self, record:tuple|list[tuple]):
+        record = self._make_list(record)
+
+        return self.insert_data(TABLE_EMAIL_RECORDS, 
+                                (COL_ER_SUBJECT, COL_ER_TEMPLATE, COL_ER_RECIPIENT, COL_ER_TICKET_ID, COL_ER_STATUS, COL_ER_ACTUATOR),
+                                record)
+
+    def get_template_id(self, template_name):
+        condition = f"{COL_ET_TEMPLATE_NAME} = '{template_name}'"
+        id =  self.get_id_by_name(TABLE_EMAIL_TEMPLATES, condition)
+        if len(id.keys()) > 0:
+            return id[self.table_id_cols[TABLE_EMAIL_TEMPLATES]]
+        return id    
+    
+    def append_mail_record(self, subject:str, template_id:int, recipient_id:int, ticket_id:int, status:int, actuator:str, **kwargs):
+        record = (subject, template_id, recipient_id, ticket_id, status, actuator)
+        return self.insert_email_record(record)
+    
     def insert_employees(self, employees:list):
         if type(employees) is tuple:
             employees = [employees]
@@ -160,6 +229,16 @@ class DBEndpoint(DatabaseConnector):
         return self.insert_data(TABLE_TASKS, 
                                 (COL_TAS_DESCRIPTION, COL_TAS_TICKET_ID, COL_TAS_STATUS, COL_TAS_ASSIGNED_TO, COL_TAS_ASSIGNED_DATE), 
                                 tasks)
+    
+    def insert_event(self, event:tuple):
+        event = self._make_list(event)
+        return self.insert_data(TABLE_EVENT_TRACKER, 
+                                (COL_EVT_TICKET_ID, COL_EVT_OBECT, COL_EVT_ACTION, COL_EVT_EMPLOYEE_ID), 
+                                event)    
+    
+    def add_event(self, ticket_id, object_id, action_id, employee_id):
+        evt = (ticket_id, object_id, action_id, employee_id)
+        return self.insert_event(evt)
     
     def create_task(self, ticket_id:int, assigned_to:int, description:str):
         assigned_date = utils.get_current_date_string()
@@ -206,6 +285,10 @@ class DBEndpoint(DatabaseConnector):
         condition = f"{COL_TAS_TICKET_ID} = {ticket_id} ORDER BY status ASC, assigned_date DESC"
         return self.read_data(TABLE_TASKS, ("*", ), condition)
     
+    def read_one_task(self, task_id)->list[tuple]:
+        condition = f"{COL_TAS_ID} = {task_id}"
+        return self.read_data(TABLE_TASKS, ("*", ), condition=condition)
+    
     def read_tickets(self, cols = ("*",),  condition = None)->list[tuple]:
         if condition is None:
             condition = f"{COL_TIC_ID} > 0 ORDER BY start_date DESC" # this will return all tickets
@@ -214,6 +297,28 @@ class DBEndpoint(DatabaseConnector):
     def read_one_ticket(self, ticket_id)->list[tuple]:
         condition = f"{COL_TIC_ID} = {ticket_id}"
         return self.read_tickets(condition=condition)
+    
+    def read_actions(self)->list[tuple]:
+        return self.read_data(TABLE_EVENT_ACTION, ('action_name',))
+
+    def read_objects(self)->list[tuple]:
+        return self.read_data(TABLE_EVENT_OBJECTS, ('object_name', ))
+    
+    def get_object_id(self, object_name:str)->list[tuple]:
+        condition = f"{COL_EVO_NAME} = '{object_name}'"
+        res = self.read_data(TABLE_EVENT_OBJECTS, (COL_EVO_ID, ), condition)
+        if len(res) > 0:
+            id_t  = res[0]
+            id = id_t[COL_EVO_ID]
+        return id
+    
+    def get_action_id(self, action_name:str)->int:
+        condition = f"{COL_EVA_NAME} = '{action_name}' "
+        res = self.read_data(TABLE_EVENT_ACTION, (COL_EVA_ID, ), condition)
+        if len(res) > 0:
+            id_t  = res[0]
+            id = id_t[COL_EVA_ID]
+        return id
     
     def update_ticket_status(self, ticket_id, status):
         return self.update_data(TABLE_TICKETS, COL_TIC_STATUS, ticket_id, status)

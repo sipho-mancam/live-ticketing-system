@@ -5,6 +5,7 @@
 <link href="{% static 'css/ticket.css'%}" rel="stylesheet"/>
 <link href="{% static 'css/task.css'%}" rel="stylesheet"/>
 <link href="{% static 'css/reassign.css'%}" rel="stylesheet"/>
+<link href="{% static 'css/logs.css'%}" rel="stylesheet"/>
 {% endblock extra_head %}
 
 
@@ -15,6 +16,26 @@
         Close
     </button>
     <iframe  src="{% url 'create-task-form' ticket_id=ticket_info.ticket_id %}" width="80%" height="480"></iframe>
+</div>
+
+<div class="task-view" id="ticket-history-overlay">
+    <button id="close-overlay-history" data-ticket_id={{ ticket_info.ticket_id }} style="width: fit-content;" type="button" class="btn btn-danger">
+        Close
+    </button>
+
+    <div class="history-logs" style="margin: auto; background-color: grey; width: 70%; height: 420px;">
+        <h4 style="color: black;">&emsp;Event Logs: </h4>
+        <hr />
+        <div class="logs-container">
+            {% for event in events %}
+            <pre class="log browser-default"><span class="time">[ {{ event.time_stamp }} ]</span> <span class="message">A {{ event.object_name }} was {{ event.action_name }} by {{ event.name }} </span></pre>
+            {% empty %}
+            <pre> No Events logged for this ticket</pre>
+            {% endfor %}
+        </div>
+    
+    </div>
+    
 </div>
 
 <div class="task-view" id="re-assign-ticket-overlay">
@@ -50,8 +71,9 @@
         <pre><span class="t-key">Start Date:</span>     {{ ticket_info.start_date }}</pre>
         <pre><span class="t-key">Close Date:</span>     {{ ticket_info.close_date }}</pre>
         <pre><span class="t-key">Department:</span>     {{ ticket_info.department }}</pre>
-        <pre><span class="t-key">Description:</span>    {{ ticket_info.description }}</pre>
         <pre><span class="t-key">Ticket Created by:</span>    {{ ticket_info.owner }}</pre>
+        <pre><span class="t-key">Description:</span>    {{ ticket_info.description }}</pre>
+        
     </div>
 
     <br />
@@ -101,7 +123,7 @@
 
                             <br /> <br />
                             <span class="d-inline-flex gap-1">
-                                {% if task.assigned_to == user.email %}
+                                {% if task.assigned_to == user.email or is_manager %}
                                 <button class="button-task-done btn btn-primary" data-task_id={{ task.task_id }} data-task_status={{ task.status }} type="button">
                                    {% if task.status == 0%}
                                         Close Task
@@ -135,11 +157,17 @@
         </button>
         {% endif %}
 
+        <button id="button-ticket-history" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-success">
+            Ticket History
+        </button>
+
         {% if can_close_ticket %}
         <button id="button-close-tick" data-ticket_id={{ ticket_info.ticket_id }} type="button" class="btn btn-danger">
             Close Ticket
         </button>
         {% endif %}
+
+        
        
     </p>
     {% endif %}
