@@ -7,56 +7,121 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="{% static 'css/t_main.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/calendar.css' %}" rel="stylesheet" />
 </head>
 
 <body>
 
-    <h1>Tickets: </h1>
+    <div class="ticket-heading">
+        <h1>Tickets: </h1>
 
-    <table class="table table-light table-striped table-hover table-sm">
-        <thead>
-            <tr>
-            {% for key in tickets.0.keys %}
-                {% if key != 'tasks' and key != 'description' %}
-                    {% if key != 'ticket_id'%}
-                    <th>{{ key }}</th>
-                    {% else %}
-                    <th>ID</th>
-                    {% endif %}
-                
-                {% endif %}
-            {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for ticket in tickets %}
-            <tr class = 'ticket-row' data-ticket_id = {{ ticket.ticket_id }}>
-                {% for key, value in ticket.items %}
-                {% if key != 'tasks'  and key != 'description' %}
-                    {% if key == 'status'%}
-                         {% if value != 'Open' %}
-                            <td><i class="bi bi-circle-fill" style="color: green; font-size: smaller;"></i>&emsp;closed </td>
-                         {% else %}
-                            <td><i class="bi bi-circle-fill" style="color: red; font-size: smaller;"></i>&emsp;open</td>
-                         {% endif %}
-                    {% else%}
-                        <td>{{ value }}</td>
-                    {% endif %}
-                {% endif %}
-
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>  
-    </table>
-
-    <footer>
         {% if is_employee %}
-        <button id = "button-create-ticket" type="button" class="btn btn-primary">Create New Ticket</button>
+        <button id = "button-create-ticket" type="button" class="create_ticket-button btn btn-primary">Create New Ticket &emsp;<i class="bi bi-plus-circle"></i> </button>
         {% endif %}
+    </div>
+    <br />
+
+    <div class="row">
+        <div class="col-2 filters_side">
+            <form action="/ticket_man/apply_filters" method="POST">
+                {% csrf_token %}
+                <h4 class="heading"><i class="bi bi-tags-fill"></i>&nbsp;Categories</h4>
+                <div>
+                    <input type="radio" id="filter-all" name="filter-all" value="0" checked />
+                    <label for="filter-all">All</label>
+                </div>
+                
+                <div>
+                    <input type="radio" id="filter-open" name="filter-all" value="1" />
+                    <label for="filter-open">Open</label>
+                </div>
+                
+                <div>
+                    <input type="radio" id="filter-close" name="filter-all" value="2" />
+                    <label for="filter-close">Close</label>
+                </div>
+
+                <div>
+                    <input type="radio" id="filter-me" name="filter-all" value="3" />
+                    <label for="filter-me">Associated with me</label>
+                </div>
+
+                <br>
+                <h4 class="heading"><i class="bi bi-funnel-fill"></i>&nbsp;Filters</h4>
+                <div class="filter-views" id="filter_list">
+                    <div class="filter-group">
+                        <span>Department</span> 
+                        <div class="filter-view-box">
+                        {%for department in departments %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value={{ department.dept_id }} name=filter-department-{{ department.dept_name }} id={{ department.dept_id }}+{{ department.dept_name }} >
+                                <label class="form-check-label" for={{ department.dept_id }}+{{ department.dept_name }} >
+                                    {{ department.dept_name }}
+                                </label>
+                            </div>
+                        {% endfor %}    
+                        </div>
+                    </div>
+                    <br />
+                    <div class="filter-group">
+                        <span>Start Date</span> 
+                        <div id="calendar"></div>
+                    </div>
+                </div> 
+                <br> 
+                
+                <button type="submit" class="btn btn-success">Apply Filters</button>
+            </form> 
+        </div>
+
+        <div class="col-9 data_table">
+            <table class="table table-light table-striped table-hover table-sm">
+                <thead>
+                    <tr>
+                    {% for key in tickets.0.keys %}
+                        {% if key != 'tasks' and key != 'description' %}
+                            {% if key != 'ticket_id'%}
+                            <th>{{ key }}</th>
+                            {% else %}
+                            <th>ID</th>
+                            {% endif %}
+                        
+                        {% endif %}
+                    {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr class = 'ticket-row' data-ticket_id = {{ ticket.ticket_id }}>
+                        {% for key, value in ticket.items %}
+                        {% if key != 'tasks'  and key != 'description' %}
+                            {% if key == 'status'%}
+                                 {% if value != 'Open' %}
+                                    <td><i class="bi bi-circle-fill" style="color: green; font-size: smaller;"></i>&emsp;closed </td>
+                                 {% else %}
+                                    <td><i class="bi bi-circle-fill" style="color: red; font-size: smaller;"></i>&emsp;open</td>
+                                 {% endif %}
+                            {% else%}
+                                <td>{{ value }}</td>
+                            {% endif %}
+                        {% endif %}
+        
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>  
+            </table>        
+        </div>
+    </div>
+   
+    <footer>
+        
     </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+
 <script src="{% static 'js/buttons.js' %}"></script>
 <script src="{% static 'js/ticket.js' %}"></script>
+<script src="{% static 'js/calendar.js' %}"></script>
 </body>
 </html>

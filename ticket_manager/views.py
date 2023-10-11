@@ -6,13 +6,6 @@ from lt_db_ops import db_connector, utils, parse2JSON, constants
 
 # Create your views here.
 def default_view(request:HttpRequest)->HttpResponse:
-    #Define the subject, HTML template, context, and recipients
-    # subject = 'Test Mailing Service'
-    # html_template = 'emails/task_assigned.html'
-    # context = {'name': 'No Reply'}
-    # to_emails = ['siphom@seb4vision.co.za']
-    # send_html_email(subject, html_template, context, to_emails
-   
     if request.user.is_authenticated:
         context = {}
         connector = db_connector.create_db_connector()
@@ -24,10 +17,16 @@ def default_view(request:HttpRequest)->HttpResponse:
             employee = connector.read_employee_from_email(user.email)
         context['is_employee'] = len(employee) > 0
         context['tickets'] = tickets
+        departments = connector.read_departments()
+        context['departments'] = departments
         connector.close_connection()
         return render(request, 'defaultView.html', context) #render(request, 'defaultView.html', {})
     else:
-      return render(request, 'not_signed_in.html', {})  
+      return render(request, 'not_signed_in.html', {}) 
+
+def apply_filters(request:HttpRequest):
+    
+    return HttpResponse(f"Filters to be applied: {request.POST}") 
 
 
 def create_ticket(request:HttpRequest)->HttpResponse:
@@ -81,7 +80,6 @@ def view_ticket(request:HttpRequest, id:int):
         connector = db_connector.create_db_connector()
         res = connector.read_one_ticket(id)
         events = connector.read_event_data(id)
-        print(events)
         context = {}
         employee  = []
         user = request.user

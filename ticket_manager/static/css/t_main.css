@@ -1,5 +1,165 @@
-@import 'table.css'
+@import 'table.css';
 
 /* body{
     background-color: rgb(227, 227, 228);
 } */
+
+.ticket-heading{
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    /* border: 1px solid black; */
+    justify-content: flex-end;
+
+}
+
+div>h4 {
+    color: grey;
+}
+
+.create-ticket-button{
+    position:absolute;
+    top: 0;
+    right: -1px;
+    height: fit-content;
+    padding: 0;
+}
+
+.ticket-heading>h1{
+    margin-right: auto;
+}
+
+
+
+.heading{
+    text-align: start;
+}
+
+
+.filters_side{
+    background-color: #c9c6c6c4;
+    border-radius: 5px;
+    padding: 10px;
+    width:fit-content;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.filter-group{
+    max-width: 100%;
+}
+
+.filter-view-box{
+    background-color: #c9c6c6c4;
+    padding: 10px;
+}
+
+.data_table{
+    max-height: 90vh;
+    height: 90vh;
+    /* border: 1px solid black; */
+    margin-left: 6px;
+    padding: 8px;
+    width: 78%;
+    background-color: #c9c6c6c4;
+    max-height: 90vh;
+    border-radius: 5px;
+}
+
+.row{
+    width: 100%;
+    margin: 0;
+    /* border: 1px solid black; */
+}
+
+
+
+.item{
+    display: flex;
+    flex-flow: row;
+    margin-left: auto;
+}
+
+.key{
+    font-size: small;
+}
+
+.value{
+    font-size: small;
+}
+
+
+ul{
+    list-style-type: none;
+}
+
+
+.s{
+    text-decoration: none;
+    color:black;
+    background-color: rgba(179, 174, 174, 0.808);
+}
+
+.s:hover{
+    text-decoration: none;
+    color: black;
+}
+
+
+
+.filter-group{
+    background-color: white;
+    padding: 6px;
+}
+
+
+.white-block{
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.wb-l{
+    position: relative;
+    top: 2px;
+    left:3px;
+}
+.wb-r{
+    position: relative;
+    top: 2px;
+    right:3px;
+}
+
+
+
+.overlay{
+    /* height: 100vh; */
+    min-height: 100vh;
+    height: fit-content;
+    z-index: 100000;
+    padding:40px;
+}
+
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    display: none;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    display: none;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #7c7b7b; 
+    display: block;
+  }

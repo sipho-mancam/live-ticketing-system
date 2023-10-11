@@ -32,7 +32,6 @@ class MailExecutionThread(threading.Thread):
         connector = db_connector.create_db_connector()
         unsent_mail = connector.get_unsent_records()
         sent_list = []
-        print("Currently we are looking at: {} unsent emails".format(len(unsent_mail)))
         for mail in unsent_mail:
             temporary_template = template + mail[constants.COL_ER_TEMPLATE]
             to_email = [f"{mail['recipient_email']}"]
@@ -48,7 +47,6 @@ class MailExecutionThread(threading.Thread):
             sent_list.append(mail[constants.COL_ER_ID])
         connector.update_unsent_to_sent_batch(sent_list)
         connector.close_connection()
-
         time.sleep(3)
 
     def stop(self):

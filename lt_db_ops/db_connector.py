@@ -22,14 +22,15 @@ class DatabaseConnector:
                 database=self.database
             )
             if self.connection.is_connected():
-                print("Connected to MySQL database")
+                pass
         except mysql.connector.Error as err:
             print("Error: {}".format(err))
+            raise(mysql.connector.Error("Failed to connect to mysql server"))
 
     def close_connection(self):
         if self.connection.is_connected():
             self.connection.close()
-            print("Connection to MySQL database closed")
+        
 
     def execute_query(self, query):
         cursor = self.connection.cursor()
