@@ -31,10 +31,8 @@ def main():
         ) from exc
     
     execution_thread.start()
-    try:
-        execute_from_command_line(sys.argv)
-    except KeyboardInterrupt as ki:
-        on_server_shutdown(signal.SIGINT, None)
+    execute_from_command_line(sys.argv)
+    
 
 if __name__ == '__main__':
     main()

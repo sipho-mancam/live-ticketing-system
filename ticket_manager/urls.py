@@ -12,4 +12,5 @@ urlpatterns = [
     path('create_task/', view=create_task, name='create-task'),
     path('reassign_ticket/', view=re_assign_ticket, name='re-assign-ticket'),
     path('delete_task/<int:task_id>', view=delete_task, name='delete-task'),
+    path('apply_filters/', view=apply_filters, name='apply-filters'),
 ]
