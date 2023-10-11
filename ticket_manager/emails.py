@@ -4,20 +4,23 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import live_ticketing_system.settings as settings
 from .tasks import send_html_email
-
+import threading
 from lt_db_ops import db_connector, utils, parse2JSON, constants
-
 import time
 
 def send_html_email_async(subject, html_template, context, to_emails):
     return send_html_email.delay(subject, html_template, context, to_emails)
 
-
-def start_mail_runner():
+class MailExecutionThread(threading.Thread):
+    def __init__(self)->None:
+        super().__init__()
+        self._stop_event = threading.Event()
     
-    template = constants.TEMPLATE_BASE_PATH
-
-    while True:
+    def run(self):
+        while not self._stop_event.is_set():
+            self.start_mail_runner()
+        
+    def start_mail_runner(self):
         # go to the database, read the emails table
         # get the records to send emails to.
         # create email, from template, 
@@ -25,6 +28,7 @@ def start_mail_runner():
         # wait for the new run to go through.
         # clear the records after reading them, 
         # sleep for a minute, do the same thing again after.
+        template = constants.TEMPLATE_BASE_PATH
         connector = db_connector.create_db_connector()
         unsent_mail = connector.get_unsent_records()
         sent_list = []
@@ -46,6 +50,10 @@ def start_mail_runner():
         connector.close_connection()
 
         time.sleep(3)
+
+    def stop(self):
+        self._stop_event.set()
     
 
-    
+mail_execution_thread = MailExecutionThread()
+

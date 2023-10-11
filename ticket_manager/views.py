@@ -1,17 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from lt_db_ops import db_connector, utils, parse2JSON, constants
-from .emails import start_mail_runner
-import threading
+
 #from pprint import pprint
 
 # Create your views here.
-
-# start the emailing service
-mail_thread = threading.Thread(target=start_mail_runner)
-mail_thread.start()
-
-
 def default_view(request:HttpRequest)->HttpResponse:
     #Define the subject, HTML template, context, and recipients
     # subject = 'Test Mailing Service'
