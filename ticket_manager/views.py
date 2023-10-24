@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from lt_db_ops import db_connector, utils, parse2JSON, constants
+from .filter import TicketsFilter
 
 #from pprint import pprint
 
@@ -9,24 +10,48 @@ def default_view(request:HttpRequest)->HttpResponse:
     if request.user.is_authenticated:
         context = {}
         connector = db_connector.create_db_connector()
-
-        tickets = connector.read_tickets()
-        tickets = parse2JSON.parse_tickets(tickets)
+        
         user = request.user
         if user.email is not None:
             employee = connector.read_employee_from_email(user.email)
+
+        e_id = employee[0][constants.COL_EMP_ID]
+        if connector.does_have_filter(e_id):
+            fil = connector.read_filter(e_id)
+            tickets = connector.read_tickets(condition=fil)
+        else:
+            tickets = connector.read_tickets()
+        
+        tickets = parse2JSON.parse_tickets(tickets)
+
         context['is_employee'] = len(employee) > 0
         context['tickets'] = tickets
         departments = connector.read_departments()
         context['departments'] = departments
+        context['employee'] = employee[0]
         connector.close_connection()
         return render(request, 'defaultView.html', context) #render(request, 'defaultView.html', {})
     else:
       return render(request, 'not_signed_in.html', {}) 
 
 def apply_filters(request:HttpRequest):
+    ticketet_filter = TicketsFilter()
+    connector = db_connector.create_db_connector()
+    user  = request.user
     
-    return HttpResponse(f"Filters to be applied: {request.POST}") 
+    if user.email is not None:
+        employee = connector.read_employee_from_email(user.email)
+
+    emp_id = employee[0][constants.COL_EMP_ID]
+    q_filter = ticketet_filter.create_filter(request.POST)
+
+    if connector.does_have_filter(emp_id):
+        connector.update_filter(emp_id, q_filter)
+    else:
+        connector.insert_filter(emp_id, q_filter)
+
+    connector.close_connection()
+    return default_view(request) 
 
 
 def create_ticket(request:HttpRequest)->HttpResponse:

@@ -239,7 +239,6 @@ class DBEndpoint(DatabaseConnector):
                                 (COL_EMP_NAME,COL_EMP_EMAIL, COL_EMP_DEPT, COL_EMP_POSITION),
                                 employees)
     
-
     def insert_tickets(self, tickets:list|tuple):
         if type(tickets) is tuple:
             tickets = self._make_list(tickets)
@@ -258,7 +257,25 @@ class DBEndpoint(DatabaseConnector):
         event = self._make_list(event)
         return self.insert_data(TABLE_EVENT_TRACKER, 
                                 (COL_EVT_TICKET_ID, COL_EVT_OBECT, COL_EVT_ACTION, COL_EVT_EMPLOYEE_ID), 
-                                event)    
+                                event)
+    def insert_filter(self, e_id:int, q_filter:str):
+        f = (e_id, q_filter)
+        f = self._make_list(f)
+        return self.insert_data(TABLE_USER_FILTERS, 
+                                (COL_UF_EID, COL_UF_FQ),
+                                f)
+
+    def does_have_filter(self, e_id:int)->bool:
+        res = self.read_filter(e_id)
+        return len(res)>0
+    
+    def read_filter(self, e_id:int):
+        condition = f"{COL_UF_EID} = {e_id}"
+        f_res = self.read_data(TABLE_USER_FILTERS, ('*',), condition)
+        if len(f_res) > 0:
+            return f_res[0][COL_UF_FQ]
+        else:
+            return ""    
     
     def add_event(self, ticket_id, object_id, action_id, employee_id):
         evt = (ticket_id, object_id, action_id, employee_id)
@@ -316,6 +333,8 @@ class DBEndpoint(DatabaseConnector):
     def read_tickets(self, cols = ("*",),  condition = None)->list[tuple]:
         if condition is None:
             condition = f"{COL_TIC_ID} > 0 ORDER BY start_date DESC" # this will return all tickets
+        else:
+            condition = f"{condition} ORDER BY start_date DESC"
         return self.read_data(TABLE_TICKETS, cols, condition)
     
     def read_one_ticket(self, ticket_id)->list[tuple]:
@@ -356,6 +375,10 @@ class DBEndpoint(DatabaseConnector):
     def update_ticket_descrition(self, ticket_id, desc):
         desc = f"'{desc}'"
         return self.update_data(TABLE_TICKETS, COL_TIC_DESCRIPTION, ticket_id, desc)
+    
+    def update_filter(self, e_id, f_query):
+        f_query = f"'{f_query}'"
+        return self.update_data(TABLE_USER_FILTERS, COL_UF_FQ, e_id, f_query)
     
     def re_assign_ticket(self, ticket_id, emp_id):
         return self.update_data(TABLE_TICKETS, COL_TIC_ASSIGNED_TO, ticket_id, emp_id)

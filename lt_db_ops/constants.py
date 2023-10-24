@@ -10,6 +10,7 @@ TABLE_EVENT_OBJECTS = 'event_objects'
 TABLE_EVENT_ACTION = 'event_action'
 TABLE_EMAIL_RECORDS = 'email_records'
 TABLE_EMAIL_TEMPLATES = 'email_templates'
+TABLE_USER_FILTERS = 'user_filter'
 
 #DEPARTMENTS COLUMNS
 COL_DEP_ID = 'dept_id'
@@ -70,7 +71,10 @@ COL_ER_ACTUATOR = 'actuator'
 COL_ET_ID = 'id'
 COL_ET_TEMPLATE_NAME = 'template_name'
 
-
+# User filters
+COL_UF_ID = 'id'
+COL_UF_EID = 'employee_id'
+COL_UF_FQ = 'filter_query'
 
 DB_TABLE_PKS = {
     TABLE_DEPARTMENTS : COL_DEP_ID,
@@ -81,11 +85,12 @@ DB_TABLE_PKS = {
     TABLE_EVENT_ACTION:COL_EVA_ID,
     TABLE_EVENT_OBJECTS:COL_EVO_ID,
     TABLE_EMAIL_RECORDS:COL_ER_ID,
-    TABLE_EMAIL_TEMPLATES:COL_ET_ID
+    TABLE_EMAIL_TEMPLATES:COL_ET_ID,
+    TABLE_USER_FILTERS:COL_UF_EID
 }
 
 DB_USER_NAME = 'root'
-DB_PASSWORD = 'seb4vision23'
+DB_PASSWORD = 'Seb4vision23'
 DB_HOST = 'localhost'
 
 STATUS_OPEN = 0

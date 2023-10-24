@@ -127,6 +127,20 @@ ADD CONSTRAINT `e_objects`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+CREATE TABLE `live_ticketing_db`.`user_filter` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `employee_id` INT NULL,
+  `filter_query` VARCHAR(1024) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `employee_idx` (`employee_id` ASC) VISIBLE,
+  CONSTRAINT `employee`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `live_ticketing_db`.`employees` (`employees_id`)
+    ON DELETE SET NULL
+    ON UPDATE NO ACTION);
+
+
 INSERT INTO live_ticketing_db.event_objects (object_name)
 	VALUES ("Ticket"), ("Task");
 
