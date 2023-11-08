@@ -30,7 +30,7 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     
-    execution_thread.start()
+    #execution_thread.start()
     execute_from_command_line(sys.argv)
     
 
